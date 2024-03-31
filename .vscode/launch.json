@@ -6,7 +6,7 @@
       "request": "launch",
       "name": "Playdate: Debug",
       "preLaunchTask": "${defaultBuildTask}",
-      "suppressMultipleSessionWarning": true
+      "suppressMultipleSessionWarning": false
     }
   ]
 }
