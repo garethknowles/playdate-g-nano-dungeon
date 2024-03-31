@@ -3,16 +3,16 @@ class('GameScene').extends(playdate.graphics.sprite)
 
 function GameScene:setupMap()
     local level = {
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0, 0, 0, 0, 0, 1},
-        {1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+        {1, 1, 1, 1, 1,  1, 1, 1, 1, 1},
+        {1, 0, 0, 0, 0,  0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0,  0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0,  0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0,  0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0,  0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0,  0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0,  0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0,  0, 0, 0, 0, 1},
+        {1, 1, 1, 1, 1,  1, 1, 1, 1, 1},
     }
     levelMap = playdate.graphics.tilemap.new()
     levelMap:setImageTable(TILESET_MANAGER.imageTable)
@@ -29,8 +29,7 @@ function GameScene:init()
         end
     )
 
-    local playerSprite = TILESET_MANAGER.imageTable:getImage(25, 1)
-    self.player = playdate.graphics.sprite.new(playerSprite)
+    self.player = playdate.graphics.sprite.new(TILESET_MANAGER:getPlayerImage())
     self.player:moveTo(0, 0)
     self.player:setCenter(0, 0)
     self.player:add()
