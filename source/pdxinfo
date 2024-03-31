@@ -1,0 +1,6 @@
+name=Nano Dungeon
+author=Gareth Knowles
+description=Basic Roguelike for Playdate
+bundleID=uk.co.garethknowles.nano.dungeon
+version=0.01
+buildNumber=1

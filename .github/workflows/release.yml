@@ -1,0 +1,51 @@
+on:
+  workflow_dispatch:
+    inputs:
+      releaseType:
+        description: "Release type"
+        required: true
+        default: "minor"
+
+jobs:
+  release_game:
+    name: builds the playdate game
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Bump version
+        shell: bash
+        env:
+          RELASE_TYPE: ${{ github.event.inputs.releaseType }}
+        run: |
+          NEW_VERSION=$(./scripts/incrementVersion.sh $RELASE_TYPE)
+          echo "NEW_VERSION=$(echo $NEW_VERSION)" >> $GITHUB_ENV
+          git config --global user.email "git@github.com"
+          git config --global user.name "GitHub Bot"
+          git commit -am "Release $NEW_VERSION"
+          git push
+
+      - name: Install Playdate SDK
+        # uses: pd-rs/get-playdate-sdk@0.1.6
+        uses: ./.github/actions/playdate-sdk
+        with:
+          arm-gcc: "false"
+
+      - name: Build Game
+        shell: bash
+        run: |
+          pdc --strip ./source g-pong.pdx
+          zip -r -9 g-pong.pdx.zip g-pong.pdx
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: g-pong.pdx
+          path: ./g-pong.pdx
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ env.NEW_VERSION }}
+          files: g-pong.pdx.zip

@@ -1,0 +1,154 @@
+name: Get Playdate SDK
+description: Download & install Playdate SDK.
+author: Alex Koz
+branding:
+  icon: package
+  color: yellow
+inputs:
+  version:
+    default: latest
+    description: SDK version (ex. `2.0.0` or default `latest`).
+    required: false
+  custom-url:
+    description: Custom URL to the SDK installer. Useful for beta versions.
+    required: false
+  cache:
+    default: "true"
+    description: Cache installer.
+    required: false
+  arm-gcc:
+    default: "true"
+    description: Whether to install arm-gcc on linux.
+    required: false
+  # path:
+  #   default: default
+  #   description: SDK installation path. Optional.
+  #   required: false
+  # token:
+  #   description: GITHUB_TOKEN. Optional.
+  #   required: false
+outputs:
+  root:
+    description: Path of SDK root
+    value: ${{ steps.output.outputs.root }}
+  version:
+    description: Version of the installed SDK.
+    value: ${{ steps.output.outputs.version }}
+runs:
+  using: "composite"
+  steps:
+    - name: prepare
+      id: cfg
+      shell: bash
+      run: |
+        OS_EXT="${{ (runner.os == 'Linux' && 'tar.gz') || (runner.os == 'macOS' && 'zip') || ( runner.os == 'Windows' && 'exe') }}"
+        RUNNER_OS_PART="${{ (runner.os == 'Linux' && '/Linux/') || (runner.os == 'macOS' && '/') || ( runner.os == 'Windows' && '/Windows/') }}"
+        URL="https://download.panic.com/playdate_sdk${RUNNER_OS_PART?}PlaydateSDK-${{ inputs.version }}.${OS_EXT?}"
+        echo "filename=sdk.$OS_EXT" >> $GITHUB_OUTPUT
+        echo "ext=$OS_EXT" >> $GITHUB_OUTPUT
+        echo "url=${{ inputs.custom-url || '$URL' }}" >> $GITHUB_OUTPUT
+
+    - name: get direct url
+      id: direct-url
+      shell: bash
+      run: |
+        trim() {
+          local trimmed="$1"
+          # Strip leading space.
+          trimmed="${trimmed## }"
+          # Strip trailing space.
+          trimmed="${trimmed%% }"
+          echo "$trimmed"
+        }
+        DIRECT_URL=$(curl -X HEAD -w "%{url_effective}" -I -L -s -S ${{ steps.cfg.outputs.url }} -o /dev/null)
+        DIRECT_URL=$(trim "$DIRECT_URL")
+        echo "direct url: $DIRECT_URL"
+        echo "url=$DIRECT_URL" >> $GITHUB_OUTPUT
+        echo "$DIRECT_URL" > ./TEMP_SDK_INSTALLER_URL
+    - name: hash url
+      id: hash
+      shell: bash
+      run: |
+        echo "url=${{ hashFiles('./TEMP_SDK_INSTALLER_URL') }}" >> $GITHUB_OUTPUT
+        echo "hash: ${{ hashFiles('./TEMP_SDK_INSTALLER_URL') }}"
+        rm ./TEMP_SDK_INSTALLER_URL
+
+    - name: Cache restore
+      if: inputs.cache == 'true'
+      uses: actions/cache/restore@v4
+      id: cache-restore
+      with:
+        path: ${{ steps.cfg.outputs.filename }}
+        key: ${{ runner.os }}-pd-sdk-${{ steps.hash.outputs.url }}
+
+    - name: download
+      # not using cache or have got cache-miss
+      if: (steps.cache-restore.outputs.cache-hit != 'true') || (inputs.cache != 'true')
+      shell: bash
+      run: |
+        curl -L -sS --show-error --fail "${{ steps.direct-url.outputs.url }}" -o ${{ steps.cfg.outputs.filename }}
+
+    - name: Cache save
+      id: cache-save
+      # cache-miss and using cache
+      if: (steps.cache-restore.outputs.cache-hit != 'true') && (inputs.cache == 'true')
+      uses: actions/cache/save@v4
+      with:
+        path: ${{ steps.cfg.outputs.filename }}
+        key: ${{ steps.cache-restore.outputs.cache-primary-key }}
+
+    - name: install
+      if: runner.os == 'macOS'
+      shell: bash
+      run: |
+        unzip ${{ steps.cfg.outputs.filename }}
+        sudo installer -store -pkg "PlaydateSDK.pkg" -target /
+        cat ~/.Playdate/config
+        echo "root: $PLAYDATE_SDK_PATH"
+        PLAYDATE_SDK_PATH="$(grep -E '^\s*SDKRoot' ~/.Playdate/config | head -n 1 | awk '{print $2}')"
+        echo "PLAYDATE_SDK_PATH=$PLAYDATE_SDK_PATH" >> $GITHUB_ENV
+
+    - name: install
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        mkdir _pd-sdk
+        tar -zxf ${{ steps.cfg.outputs.filename }} -C _pd-sdk
+        cd _pd-sdk/*/
+        # sudo chown runner setup.sh && chmod +x setup.sh
+        sudo ./setup.sh || true
+        echo "PLAYDATE_SDK_PATH=$PWD" >> $GITHUB_ENV
+        echo "$PWD/bin" >> $GITHUB_PATH
+
+    - name: install gnu-arm-gcc
+      if: runner.os == 'Linux' && inputs.arm-gcc == 'true'
+      shell: bash
+      run: |
+        sudo apt install -y gcc-arm-none-eabi
+
+    - name: install latest SDK
+      if: runner.os == 'Windows'
+      shell: powershell
+      # /D doesn't works
+      # run: Start-Process -Wait -FilePath "${{ steps.cfg.outputs.filename }}" -ArgumentList "/S","/D=D:\\PlaydateSDK"
+      run: Start-Process -Wait -FilePath "${{ steps.cfg.outputs.filename }}" -ArgumentList "/S"
+
+    - name: set env
+      if: runner.os == 'Windows'
+      shell: bash
+      run: |
+        PLAYDATE_SDK_PATH_lOCAL=$(realpath ~/Documents/PlaydateSDK)
+        echo "PLAYDATE_SDK_PATH=$PLAYDATE_SDK_PATH_lOCAL" >> "$GITHUB_ENV"
+        echo "$PLAYDATE_SDK_PATH_lOCAL/bin" >> $GITHUB_PATH
+
+    - name: install gnu-arm-gcc
+      if: runner.os == 'Windows'
+      shell: powershell
+      run: choco install --no-progress gcc-arm-embedded -y
+
+    - name: post setup
+      id: output
+      shell: bash
+      run: |
+        echo "root=$PLAYDATE_SDK_PATH" >> $GITHUB_OUTPUT
+        echo "version=$(cat $PLAYDATE_SDK_PATH/VERSION.txt)" >> $GITHUB_OUTPUT
