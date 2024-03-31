@@ -3,17 +3,22 @@ import "CoreLibs/graphics"
 import "CoreLibs/sprites"
 import "CoreLibs/timer"
 
-import "Managers/SceneManager"
-import "Scenes/GameScene"
+import "utils/tables"
+
+import "managers/SceneManager"
+import "managers/TilesetManager"
+
+import "scenes/GameScene"
+import "scenes/GameOverScene"
 
 local gfx <const> = playdate.graphics
-
 
 local function setup()
 	math.randomseed(playdate.getSecondsSinceEpoch())
 	playdate.display.setRefreshRate(30)
 
   SCENE_MANAGER = SceneManager()
+  TILESET_MANAGER = TilesetManager()
   GameScene()
 end
 

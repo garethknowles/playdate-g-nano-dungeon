@@ -5,14 +5,17 @@ function GameOverScene:init(text)
     playdate.graphics.pushContext(gameOverImage)
         playdate.graphics.drawText(text, 0, 0)
     playdate.graphics.popContext()
-    local gameOverSprite = playdate.graphics.sprite.new(gameOverImage)
-    gameOverSprite:moveTo(200, 120)
+    gameOverSprite = playdate.graphics.sprite.new(gameOverImage)
+    gameOverSprite:moveTo(0, 120)
+    gameOverSprite:setCenter(0, 0)
     gameOverSprite:add()
 
     self:add()
 end
 
 function GameOverScene:update()
+    gameOverSprite:moveTo((gameOverSprite.x + 3) % 400, gameOverSprite.y)
+
     if playdate.buttonJustPressed(playdate.kButtonA) then
         SCENE_MANAGER:switchScene(GameScene)
     end
