@@ -1,7 +1,6 @@
 class('GameOverScene').extends(playdate.graphics.sprite)
 
 function GameOverScene:init(text)
-    -- local text = "Game Over"
     local gameOverImage = playdate.graphics.image.new(playdate.graphics.getTextSize(text))
     playdate.graphics.pushContext(gameOverImage)
         playdate.graphics.drawText(text, 0, 0)

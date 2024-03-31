@@ -8,13 +8,13 @@ import "Scenes/GameScene"
 
 local gfx <const> = playdate.graphics
 
-SCENE_MANAGER = SceneManager()
-
-GameScene()
 
 local function setup()
 	math.randomseed(playdate.getSecondsSinceEpoch())
 	playdate.display.setRefreshRate(30)
+
+  SCENE_MANAGER = SceneManager()
+  GameScene()
 end
 
 function playdate.update()
