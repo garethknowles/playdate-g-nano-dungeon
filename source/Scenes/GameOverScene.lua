@@ -8,7 +8,7 @@ function scene:init()
 
     local gameOverImage = Graphics.image.new(Graphics.getTextSize(text))
     Graphics.pushContext(gameOverImage)
-        Graphics.drawText(text, 0, 0)
+        Noble.Text.draw(text, 0, 0)
     Graphics.popContext()
     gameOverSprite = Graphics.sprite.new(gameOverImage)
     gameOverSprite:moveTo(0, 120)
@@ -23,6 +23,6 @@ function scene:update()
     gameOverSprite:moveTo((gameOverSprite.x + 3) % 400, gameOverSprite.y)
 
     if playdate.buttonJustPressed(playdate.kButtonA) then
-        Noble.transition(GameScene, 1, Noble.Transition.SpotlightMask)
+        Noble.transition(GameScene, 1, Noble.Transition.CrossDissolve)
     end
 end
