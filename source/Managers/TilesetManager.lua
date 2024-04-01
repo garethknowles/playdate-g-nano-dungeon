@@ -1,6 +1,6 @@
-import "../assets/room1"
+import("../assets/room1")
 
-class ('TilesetManager').extends()
+class("TilesetManager").extends()
 
 -- Index of Tiles
 local BLANK_INDEX = 1
@@ -20,15 +20,13 @@ function TilesetManager:getPlayerImage()
 end
 
 function TilesetManager:levelToTiles(level)
-  return map(flatten(level),
-    function(item)
-        if item == 1 then
-            return WALL_INDEX
-        else
-            return BLANK_INDEX
-        end
+  return map(flatten(level), function(item)
+    if item == 1 then
+      return WALL_INDEX
+    else
+      return BLANK_INDEX
     end
-  )
+  end)
 end
 
 function TilesetManager:isWall(index)

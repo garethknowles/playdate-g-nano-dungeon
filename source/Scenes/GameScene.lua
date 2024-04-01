@@ -1,5 +1,5 @@
 GameScene = {}
-class('GameScene').extends(NobleScene)
+class("GameScene").extends(NobleScene)
 local scene = GameScene
 
 scene.backgroundColor = Graphics.kColorBlack
@@ -7,7 +7,7 @@ scene.backgroundColor = Graphics.kColorBlack
 scene.inputHandler = {
   AButtonDown = function()
     Noble.transition(GameOverScene, 1, Noble.Transition.SpotlightMask)
-  end
+  end,
 }
 
 function scene:init()
@@ -21,7 +21,7 @@ function scene:start()
   local x = 13
   local y = 13
   self.player = Player(x, y)
-  self.player:moveTo(16*x, 16*y)
+  self.player:moveTo(16 * x, 16 * y)
   self:addSprite(self.player)
   self.turnManager:addEntitiy(self.player)
 end
@@ -38,5 +38,3 @@ function scene:update()
   end
   self.turnManager:turn()
 end
-
-
