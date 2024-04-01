@@ -43,20 +43,19 @@ function Player:turn()
 
 		if moved == true then
 			self.movementPoints -= 1
+		else
+			return
 		end
 
 		-- wall collision check
-		if dungeon:isWall(self.x, self.y) then
+		local isWall = dungeon:isWall(self.x/16, self.y/16)
+		if isWall then
 			self.x = oldX
 			self.y = oldY
+			return
 		end
 
-		-- tile movement code
-		-- if (not self.x == oldX) or (not self.y == oldY) then
-			self:moveTo(self.x, self.y)
-			-- dungeon.map.putTileAt(this.sprite, this.x, this.y)
-			-- dungeon.map.putTileAt(dungeon.sprites.floor, oldX, oldY)
-		-- end
+		self:moveTo(self.x, self.y)
 	end
 end
 
