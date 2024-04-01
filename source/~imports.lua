@@ -12,7 +12,12 @@ import "utils/tables"
 
 -- Managers
 import "managers/TilesetManager"
+import "managers/TurnManager"
 
 -- Scenes
 import "scenes/GameScene"
 import "scenes/GameOverScene"
+
+-- Entities
+import "entities/Dungeon"
+import "entities/Player"

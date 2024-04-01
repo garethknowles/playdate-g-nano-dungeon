@@ -1,12 +1,14 @@
+import "../assets/room1"
+
 class ('TilesetManager').extends()
 
 -- Index of Tiles
-local BLANK = 1
+local BLANK_INDEX = 1
 local WALL_INDEX = 844
 local PLAYER_INDEX = 418
 
 function TilesetManager:init()
-  self.imageTable = playdate.graphics.imagetable.new("assets/monochrome_packed")
+  self.imageTable = Graphics.imagetable.new("assets/monochrome_packed")
 end
 
 function TilesetManager:getImageTable()
@@ -23,8 +25,12 @@ function TilesetManager:levelToTiles(level)
         if item == 1 then
             return WALL_INDEX
         else
-            return BLANK
+            return BLANK_INDEX
         end
     end
   )
+end
+
+function TilesetManager:isWall(index)
+  return index == WALL_INDEX
 end
