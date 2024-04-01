@@ -1,22 +1,28 @@
-class('GameOverScene').extends(playdate.graphics.sprite)
+class('GameOverScene').extends(NobleScene)
+local scene = GameOverScene
 
-function GameOverScene:init(text)
-    local gameOverImage = playdate.graphics.image.new(playdate.graphics.getTextSize(text))
-    playdate.graphics.pushContext(gameOverImage)
-        playdate.graphics.drawText(text, 0, 0)
-    playdate.graphics.popContext()
-    gameOverSprite = playdate.graphics.sprite.new(gameOverImage)
+function scene:init()
+    scene.super.init(self)
+
+    local text = "Game Over Scene"
+
+    local gameOverImage = Graphics.image.new(Graphics.getTextSize(text))
+    Graphics.pushContext(gameOverImage)
+        Graphics.drawText(text, 0, 0)
+    Graphics.popContext()
+    gameOverSprite = Graphics.sprite.new(gameOverImage)
     gameOverSprite:moveTo(0, 120)
     gameOverSprite:setCenter(0, 0)
-    gameOverSprite:add()
 
-    self:add()
+    self:addSprite(gameOverSprite)
 end
 
-function GameOverScene:update()
+function scene:update()
+    scene.super.update(self)
+
     gameOverSprite:moveTo((gameOverSprite.x + 3) % 400, gameOverSprite.y)
 
     if playdate.buttonJustPressed(playdate.kButtonA) then
-        SCENE_MANAGER:switchScene(GameScene)
+        Noble.transition(GameScene, 1, Noble.Transition.SpotlightMask)
     end
 end

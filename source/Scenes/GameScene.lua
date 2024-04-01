@@ -1,6 +1,33 @@
-class('GameScene').extends(playdate.graphics.sprite)
+GameScene = {}
+class('GameScene').extends(NobleScene)
+local scene = GameScene
 
-function GameScene:setupMap()
+scene.backgroundColor = Graphics.kColorBlack
+
+player = {}
+scene.inputHandler = {
+    AButtonDown = function()
+        Noble.transition(GameOverScene, 1, Noble.Transition.SpotlightMask)
+    end,
+
+    upButtonDown = function()
+        player:moveBy(0, -playerSpeed)
+    end,
+
+    rightButtonDown = function()
+        player:moveBy(playerSpeed, 0)
+    end,
+
+    downButtonDown = function()
+        player:moveBy(0, playerSpeed)
+    end,
+
+    leftButtonDown = function()
+        player:moveBy(-playerSpeed, 0)
+    end
+}
+
+function scene:setupMap()
     local level = {
         {1, 1, 1, 1, 1,  1, 1, 1, 1, 1},
         {1, 0, 0, 0, 0,  0, 0, 0, 0, 1},
@@ -13,48 +40,32 @@ function GameScene:setupMap()
         {1, 0, 0, 0, 0,  0, 0, 0, 0, 1},
         {1, 1, 1, 1, 1,  1, 1, 1, 1, 1},
     }
-    levelMap = playdate.graphics.tilemap.new()
-    levelMap:setImageTable(TILESET_MANAGER.imageTable)
-    levelMap:setTiles(TILESET_MANAGER:levelToTiles(level), 10)
+    self.levelMap = Graphics.tilemap.new()
+    self.levelMap:setImageTable(TILESET_MANAGER.imageTable)
+    self.levelMap:setTiles(TILESET_MANAGER:levelToTiles(level), 10)
 end
 
-function GameScene:init()
+function scene:init()
+    scene.super.init(self)
+
     self:setupMap()
 
-    self:setCenter(0, 0)
-    self.setBackgroundDrawingCallback(
-        function(x, y, width, height)
-            levelMap:draw(0, 0)
-        end
-    )
+    player = Graphics.sprite.new(TILESET_MANAGER:getPlayerImage())
+    player:moveTo(0, 0)
+    player:setCenter(0, 0)
+    self:addSprite(player)
 
-    self.player = playdate.graphics.sprite.new(TILESET_MANAGER:getPlayerImage())
-    self.player:moveTo(0, 0)
-    self.player:setCenter(0, 0)
-    self.player:add()
-
-    self.playerSpeed = 16
-
-    self:add()
+    playerSpeed = 16
 end
 
-function GameScene:update()
-    if playdate.buttonJustPressed(playdate.kButtonA) then
-        SCENE_MANAGER:switchScene(GameOverScene, "Game Over Scene")
-        return
-    end
+function scene:drawBackground(__x, __y, __width, __height)
+    scene.super.drawBackground(self)
 
-    if playdate.buttonIsPressed(playdate.kButtonUp) then
-        self.player:moveBy(0, -self.playerSpeed)
-    end
-    if playdate.buttonIsPressed(playdate.kButtonRight) then
-        self.player:moveBy(self.playerSpeed, 0)
-    end
-    if playdate.buttonIsPressed(playdate.kButtonDown) then
-        self.player:moveBy(0, self.playerSpeed)
-    end
-    if playdate.buttonIsPressed(playdate.kButtonLeft) then
-        self.player:moveBy(-self.playerSpeed, 0)
-    end
+    self.levelMap:draw(0, 0)
+end
+
+function scene:update()
+    scene.super.update(self)
 
 end
+
