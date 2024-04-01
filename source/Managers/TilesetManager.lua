@@ -3,7 +3,7 @@ class ('TilesetManager').extends()
 -- Index of Tiles
 local BLANK = 1
 local WALL_INDEX = 844
-local PLAYER_INDEX = 26
+local PLAYER_INDEX = 418
 
 function TilesetManager:init()
   self.imageTable = playdate.graphics.imagetable.new("assets/monochrome_packed")

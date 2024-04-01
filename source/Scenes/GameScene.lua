@@ -1,4 +1,3 @@
-
 class('GameScene').extends(playdate.graphics.sprite)
 
 function GameScene:setupMap()
@@ -9,8 +8,8 @@ function GameScene:setupMap()
         {1, 0, 0, 0, 0,  0, 0, 0, 0, 1},
         {1, 0, 0, 0, 0,  0, 0, 0, 0, 1},
         {1, 0, 0, 0, 0,  0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0,  0, 0, 0, 0, 1},
-        {1, 0, 0, 0, 0,  0, 0, 0, 0, 1},
+        {1, 0, 0, 0, 0,  0, 1, 0, 0, 1},
+        {1, 0, 0, 0, 0,  0, 1, 0, 0, 1},
         {1, 0, 0, 0, 0,  0, 0, 0, 0, 1},
         {1, 1, 1, 1, 1,  1, 1, 1, 1, 1},
     }
@@ -33,7 +32,7 @@ function GameScene:init()
     self.player:moveTo(0, 0)
     self.player:setCenter(0, 0)
     self.player:add()
-    
+
     self.playerSpeed = 16
 
     self:add()
